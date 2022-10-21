@@ -1,0 +1,16 @@
+POST http://localhost:3001/api/devs/ 
+content-type: application/json
+
+  {
+    "nivel": "Senior",
+    "nome": "Antonio Andrade",
+    "sexo": "M",
+    "datanascimento": "1935-10-17",
+    "idade": "",
+    "hobby": "Natação"
+  },
+
+### 
+DELETE http://localhost:3001/api/dev/1
+### 
+GET  http://localhost:3001/api/devs/

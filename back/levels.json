@@ -1,0 +1,10 @@
+[
+    {"id": 0 ,
+     "level": "Junior"},
+     {"id": 1 ,
+     "level": "Pleno"},
+     {"id": 2 ,
+     "level": "Senior"},
+     {"id": 3 ,
+     "level": "Master"}
+]

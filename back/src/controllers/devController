@@ -1,0 +1,116 @@
+const express      = require('express'),
+  router           = express.Router();
+
+    // export router
+  module.exports = router;
+
+  let devs = require('../../devs.json')
+  let levels = require('../../levels.json')
+
+const queryFilter = (queryString, response, objArray) =>{
+  if(Object.keys(queryString).length!=0){
+    let filtred=[...objArray]
+    for (const key in queryString) {
+      if (filtred[0].hasOwnProperty(key)) {
+        filtred=filtred.filter(level =>
+          (level[key].match(RegExp(queryString[key], "i")))
+        )
+      }
+    }
+    if(filtred.length!=0)
+      response.end(JSON.stringify(filtred))
+    else
+      response.status(404).end("")
+  }else{
+    response.end(JSON.stringify(objArray))
+  }
+}
+
+const showAllDevs = (request, response) => {
+  queryFilter(request.query, response, devs)
+}
+
+const showOneDev = (request, response) => {
+  const id = Number(request.params.id)
+  const dev = devs.find(dev => dev.id === id)
+  if (dev == null)
+    response.status(404).end('dev not found')
+  response.json(dev)
+}
+
+const createNewDev = (request, response) => {
+
+  if (!request.body) response.status(404).end()
+  else {
+    let id = 0;
+    while (devs.find(dev => dev.id == id) != null) {
+      id++
+    }
+    if (levels.find(level => level.level == request.body.level) == null) {
+      response.status(400).send("Nível " + level + " inexistente")
+    } else {
+
+      const dev = {
+        "id": id,
+        "level": request.body.level,
+        "nome": request.body.nome,
+        "sexo": request.body.sexo,
+        "datanascimento": request.body.datanascimento,
+        "hobby": request.body.hobby
+      }
+
+      devs = devs.concat(dev)
+      levels[levels.findIndex(level => level.level == request.body.level)].numberOfDevs += 1
+      response.status(201).json(devs)
+    }
+  }
+}
+
+const editDev = (request, response) => {
+  const id = Number(request.params.id)
+  if (!request.body) response.status(400).end()
+  else if (devs.find(level => level.id === id)==null){
+    response.status(400).end("Desenvolvedor não foi encontrado no sistema\n Por favor, recadastrar")
+  }
+  else {
+    if (levels.find(level => level.level == request.body.level) == null) {
+      response.status(400).send("Nível inexistente")
+    } else {
+      const editedDev = {
+        "id": request.body.id,
+        "level": request.body.level,
+        "nome": request.body.nome,
+        "sexo": request.body.sexo,
+        "datanascimento": request.body.datanascimento,
+        "hobby": request.body.hobby
+      }
+      let newDevs = [...devs]
+      newDevs[devs.findIndex(dev => dev.id == id)] = editedDev
+      levels[levels.findIndex(level => level.level == devs[id].level)].numberOfDevs -= 1
+      levels[levels.findIndex(level => level.level == newDevs[id].level)].numberOfDevs += 1
+      devs = newDevs
+      response.json(devs)
+    }
+  }
+}
+
+const deleteDev = (request, response) => {
+
+  const id = Number(request.params.id)
+  if (devs.find(dev => dev.id === id)==null)
+    response.status(400).send("Não encontrado")
+  else{
+    const levelName = devs[devs.findIndex(dev => dev.id == id)].level
+    levels[levels.findIndex(level => level.level == levelName)].numberOfDevs -= 1
+    devs = devs.filter(dev => dev.id != id)
+    response.json(devs).status(204)
+  }
+}
+module.exports = {
+    showAllDevs: showAllDevs,
+    showOneDev: showOneDev,
+    editDev: editDev,
+    createNewDev: createNewDev,
+    deleteDev: deleteDev
+}
+

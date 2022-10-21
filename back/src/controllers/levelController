@@ -1,0 +1,104 @@
+const express      = require('express'),
+  router           = express.Router();
+
+    // export router
+  module.exports = router;
+
+  let devs = require('../../devs.json')
+  let levels = require('../../levels.json')
+
+const queryFilter = (queryString, response, objArray) =>{
+  if(Object.keys(queryString).length!=0){
+    let filtred=[...objArray]
+    for (const key in queryString) {
+      if (filtred[0].hasOwnProperty(key)) {
+        filtred=filtred.filter(level =>
+          (level[key].match(RegExp(queryString[key], "i")))
+        )
+      }
+    }
+    if(filtred.length!=0)
+      response.end(JSON.stringify(filtred))
+    else
+      response.status(404).end("")
+  }else{
+    response.end(JSON.stringify(objArray))
+  }
+}
+
+const showAllLevels = (request, response) => {
+  queryFilter(request.query, response, levels)
+}
+
+const showOneLevel = (request, response) => {
+  const id = Number(request.params.id)
+  const level = levels.find(level => level.id === id)
+  if (level == null)
+    response.status(404).end('Level not found')
+  response.json(level)
+}
+const createNewLevel = (request, response) => {
+
+  if (!request.body) response.status(404).end()
+  else {
+    if (levels.find(level => level.level == request.body.level) != null) {
+      response.status(400).end("Nível já existente")
+    } else {
+      let id = 0;
+      while (levels.find(dev => dev.id == id) != null)
+        id++
+
+      const editedLevel = {
+        "id": id,
+        "level": request.body.level,
+        "numberOfDevs": 0
+      }
+      levels = levels.concat(editedLevel)
+      response.status(201).json(levels)
+    }
+  }
+}
+
+const deleteLevel = (request, response) => {
+  const id = Number(request.params.id)
+  if (levels.find(level => level.id === id)==null)
+    response.status(400).send("Não encontrado")
+  else{
+    const name = levels.find(level => level.id == id).level
+    if (devs.find(dev => dev.level == name) != null) {
+      response.status(501).send("Existem desenvolvedores nesse nível")
+    } else {
+      levels = levels.filter(level => level.id != id)
+      response.send(levels).status(204)
+    }
+  }
+}
+const editLevel = (request, response) => {
+  const id = Number(request.params.id)
+  if (!request.body) response.status(400).end()
+  else if (levels.find(level => level.id === id)==null){
+    response.status(400).end("Nível não encontrado no sistema")
+  }
+  else {
+    const oldName = levels[id].level
+    const newName = request.body.level
+    const editedLevel = {
+      "id": request.body.id,
+      "level": newName,
+      "numberOfDevs": levels[id].numberOfDevs
+    }
+    let newLevels = [...levels]
+    newLevels[devs.findIndex(level => level.id == id)] = editedLevel
+    levels = newLevels
+    devs.forEach(dev => { if (dev.level == oldName) dev.level = newName })
+    response.json(levels)
+  }
+}
+
+module.exports = {
+    showAllLevels: showAllLevels,
+    showOneLevel: showOneLevel,
+    editLevel: editLevel,
+    createNewLevel: createNewLevel,
+    deleteLevel: deleteLevel
+}

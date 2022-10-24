@@ -13,7 +13,7 @@ const devSubTabs = ["devsTable", "devsEdit"]
 const NewButtomHandler = (setNewDev, levels) => {
   setNewDev({
     id: null,
-    level: levels[0].level,
+    level: levels[0],
     nome: "",
     sexo: "",
     datanascimento: "1995-10-17",
@@ -24,8 +24,8 @@ const NewButtomHandler = (setNewDev, levels) => {
 }
 const NewOrEditDev = ({ newDev, setNewDev, setDevs, levels }) => {
   let id = newDev.id;
-  let unsetValues = {
-    level: newDev.level.trim() === "" ? "unset" : "set",
+  let unsetValues = { 
+    level: newDev.nome.trim() === "" ? "unset" : "set",
     nome: newDev.nome.trim() === "" ? "unset" : "set",
     sexo: newDev.sexo.trim() === "" ? "unset" : "set",
     datanascimento: newDev.datanascimento.trim() === "" ? "unset" : "set",
@@ -33,7 +33,11 @@ const NewOrEditDev = ({ newDev, setNewDev, setDevs, levels }) => {
   }
   const editDev = (value, varName) => {
     let tempDev = { ...newDev }
-    tempDev[varName] = value
+    if (varName =="level")
+      tempDev[varName] = levels.find(level=> level.nome==value)
+    else
+      tempDev[varName] = value
+    
     setNewDev(tempDev)
     if (value.trim() === "") {
       unsetValues[varName] = "unset"
@@ -47,13 +51,14 @@ const NewOrEditDev = ({ newDev, setNewDev, setDevs, levels }) => {
     else if (isSet === "unset")
       return (<code>&#10060;</code>)
   }
-  const OptLevels = levels.map(level => { return (<option key={level.level}>{level.level}</option>) })
+  console.log(newDev);
+  const OptLevels = levels.map(level => { return (<option key={level.nome}>{level.nome}</option>) })
   return (
     <div className="FullTable">
       <table >
         <tbody>
           <tr><th>Nome </th><td><input onChange={(event) => { editDev(event.target.value, "nome") }} value={newDev.nome} placeholder="nome" /> <SetSymbol isSet={unsetValues.nome} /> </td></tr>
-          <tr><th>Level </th><td><select onChange={(event) => { editDev(event.target.value, "level") }} className="devSelector" value={newDev.level}> {OptLevels} </select><SetSymbol isSet={unsetValues.datanascimento} /> </td></tr>
+          <tr><th>Level </th><td><select onChange={(event) => { editDev(event.target.value, "level") }} className="devSelector" value={newDev.level.nome}> {OptLevels} </select><SetSymbol isSet={unsetValues.datanascimento} /> </td></tr>
           <tr><th>Sexo </th><td><input onChange={(event) => { editDev(event.target.value, "sexo") }} value={newDev.sexo} placeholder="sexo" /> <SetSymbol isSet={unsetValues.sexo} /> </td></tr>
           <tr><th>Nascimento </th><td><input onChange={(event) => { editDev(event.target.value, "datanascimento") }} value={newDev.datanascimento} type="date" /> <SetSymbol isSet={unsetValues.datanascimento} /> </td></tr>
           <tr><th>Hobby </th><td><input onChange={(event) => { editDev(event.target.value, "hobby") }} value={newDev.hobby} placeholder="hobby" /> <SetSymbol isSet={unsetValues.hobby} /> </td></tr>
@@ -95,7 +100,7 @@ const ShowDevs = ({ refresh, levels }) => {
         <tr key={dev.id}>
           <td>{dev.id}</td>
           <td>{dev.nome}</td>
-          <td>{dev.level}</td>
+          <td>{dev.level.nome}</td>
           <td>{dev.sexo}</td>
           <td>{invertDate(dev.datanascimento)}</td>
           <td>{getAge(dev.datanascimento)}</td>

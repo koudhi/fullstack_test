@@ -20,18 +20,20 @@ const NewButtomHandler = (setNewLevel) => {
 const NewOrEditLevel = ({ newLevel, setNewLevel, setLevels }) => {
   let id = newLevel.id;
   const editLevel = (value, varName) => {
+    console.log(value);
     let tempLevel = { ...newLevel }
     tempLevel[varName] = value
     setNewLevel(tempLevel)
-    if (newLevel.level.trim() === "")
-      unsetValues.level = "unset"
+    if (newLevel.nome.trim() === "")
+      unsetValues.nome = "unset"
     else
-      unsetValues.level = "set"
+      unsetValues.nome = "set"
 
 
   }
   let unsetValues = {
-    level: newLevel.level.trim() === "" ? "unset" : "set",
+    level: "set",
+    //level: newLevel.nome.trim() === "" ? "unset" : "set",
   }
   const SetSymbol = ({ isSet }) => {
     if (isSet === "set")
@@ -43,7 +45,7 @@ const NewOrEditLevel = ({ newLevel, setNewLevel, setLevels }) => {
     <div className="FullTable">
       <table>
         <tbody>
-          <tr><th>Nível </th><td><input onChange={(event) => { editLevel(event.target.value, "level") }} value={newLevel.level} placeholder="nível" /><SetSymbol isSet={unsetValues.level} /></td></tr>
+          <tr><th>Nível </th><td><input onChange={(event) => { editLevel(event.target.value, "nome") }} value={newLevel.nome} placeholder="nível" /><SetSymbol isSet={unsetValues.nome} /></td></tr>
         </tbody>
       </table>
       <div>
@@ -68,20 +70,18 @@ const ShowLevels = ({ refresh, levels, setLevels }) => {
   useEffect(() => {
     axios
       .get(apiUrl)
-      .then(response => {
-        setLevels(response.data)
-      })
+      .then(response => setLevels(response.data) )
   }, [refresh, setLevels])
-
+  
   const ordenanteLevels = levels.sort((a, b) => sortByTag(a, b, sortBy))
-    .filter(level => (level.level.match(RegExp(searchLevel, "i")) || searchLevel === ""))
+    .filter(level =>(level.nome.match(RegExp(searchLevel, "i")) || searchLevel === ""))
 
   const printLevels = ordenanteLevels.map((level, idx) => {
     if (idx >= pageLen * (page - 1) && idx < pageLen * (page))
       return (
         <tr key={level.id}>
           <td>{level.id}</td>
-          <td>{level.level}</td>
+          <td>{level.nome}</td>
           <td>{level.numberOfDevs}</td>
           <td>
             <button onClick={() => buttomHandler.edit(setNewLevel, level.id, apiUrl, levelSubTabs)}>Editar</button>

@@ -1,39 +1,37 @@
-const { CHAR } = require('sequelize');
-
-const mongoose = require('mongoose'),
-Schema = mongoose.Schema;
-
-// create a schema
-const devSchema = new Schema({
-    level: String,
-    nome: {
-        type: String,
-        unique: true
+var EntitySchema = require("typeorm").EntitySchema
+level = require('./level')
+module.exports = new EntitySchema({
+  name: "Dev", // Will use table name `category` as default behaviour.
+  tableName: "devs", // Optional: Provide `tableName` property to override the default behaviour for table name.
+  columns: {
+    id: {
+      primary: true,
+      type: "int",
+      generated: true,
     },
-    sexo: CHAR,
-    datanascimento: Date,
-    hobby: String
-});
+    nome: {
+      type: "varchar",
+      unique: true,
+    },
+    sexo: {
+      type: "char",
+    },
+    datanascimento: {
+      type: "date",
+    },
+    hobby: {
+      type: "varchar",
+    },
+  },
+  relations: {
+    level: {
+      eager: false,
+      type: 'many-to-one',
+      target: 'Level',
+      cascade: true,
+      inverseSide: 'dev',
+      orphanedRowAction: 'disable',
+    },
+  },
 
-// middleware -----
-// make sure that the slug is created from the name
-//eventSchema.pre('save', function(next) {
-//    this.slug = slugify(this.name);
-//    next();
-//  });
-  
-  // create the model
-  const devModel = mongoose.model('Dev', devSchema);
-  
-  // export the model
-  module.exports = devModel;
-  
-  // function to slugify a name
-  function slugify(text) {
-    return text.toString().toLowerCase()
-      .replace(/\s+/g, '-')           // Replace spaces with -
-      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-      .replace(/^-+/, '')             // Trim - from start of text
-      .replace(/-+$/, '');            // Trim - from end of text
-  }
+})

@@ -1,10 +1,14 @@
 [
-    {"id": 0 ,
-     "level": "Junior"},
-     {"id": 1 ,
-     "level": "Pleno"},
-     {"id": 2 ,
-     "level": "Senior"},
-     {"id": 3 ,
-     "level": "Master"}
+    {
+     "nome": "Junior",
+     "numberOfDevs":1},
+     {
+     "nome": "Pleno",
+     "numberOfDevs":1},
+     {
+     "nome": "Senior",
+     "numberOfDevs":1},
+     {
+     "nome": "Master",
+     "numberOfDevs":1}
 ]

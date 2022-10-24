@@ -1,15 +1,11 @@
 const express      = require('express'),
   router           = express.Router(),
-  devController    = require('./controllers/devController'),
+  devController    = require('./controllers/devController.js'),
   mainController    = require('./controllers/mainController.js'),
-  levelController  = require('./controllers/levelController');
+  levelController  = require('./controllers/levelController.js');
 
     // export router
   module.exports = router;
-
-const { log } = require('console');
-  let devs = require('../devs.json')
-  let levels = require('../levels.json')
 
 router.get('/', mainController.main)
 

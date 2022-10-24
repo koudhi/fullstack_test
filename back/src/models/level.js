@@ -1,36 +1,30 @@
-const { CHAR } = require('sequelize');
+var EntitySchema = require("typeorm").EntitySchema
+dev = require('./dev')
 
-const mongoose = require('mongoose'),
-Schema = mongoose.Schema;
-
-// create a schema
-const levelSchema = new Schema({
-    level: {
-        type: String,
-        unique: true
+module.exports = new EntitySchema({
+  name: "Level", // Will use table name `category` as default behaviour.
+  tableName: "levels", // Optional: Provide `tableName` property to override the default behaviour for table name.
+  columns: {
+    id: {
+      primary: true,
+      type: "int",
+      generated: true,
     },
-    occupation: Number
-});
-
-// middleware -----
-// make sure that the slug is created from the name
-//eventSchema.pre('save', function(next) {
-//    this.slug = slugify(this.name);
-//    next();
-//  });
-  
-  // create the model
-  const levelModel = mongoose.model('Level', levelSchema);
-  
-  // export the model
-  module.exports = levelModel;
-  
-  // function to slugify a name
-  function slugify(text) {
-    return text.toString().toLowerCase()
-      .replace(/\s+/g, '-')           // Replace spaces with -
-      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-      .replace(/^-+/, '')             // Trim - from start of text
-      .replace(/-+$/, '');            // Trim - from end of text
-  }
+    nome: {
+      type: "varchar",
+      unique: true,
+    },
+    numberOfDevs: {
+      type: "int",
+      unique: false,
+    },
+  },
+  relation: {
+    dev: {
+      type: 'one-to-many',
+      target: 'Dev',
+      cascade: true,
+      inverseSide: 'level',
+    },
+  },
+})
